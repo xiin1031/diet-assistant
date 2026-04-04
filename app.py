@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-=======
 
->>>>>>> 1829a65643677a7d8fbd17b5b3868ec1bbc17dee
 # app.py - 完整版（适配角色A的数据 + 角色B的后端）
 import streamlit as st
 import pandas as pd
@@ -294,4 +291,3 @@ with tab3:
 st.markdown("---")
 st.caption("⚠️ 本工具仅供参考，不能替代专业医疗建议")
 st.caption("⚠️ 本工具仅供参考，不能替代专业医疗建议")
-
