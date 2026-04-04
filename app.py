@@ -8,11 +8,11 @@ import os
 from datetime import datetime
 
 # 添加backend路径，导入角色B的模块
-sys.path.append('./backend')
+sys.path.append(os.path.join(os.path.dirname(__file__), 'backend'))
 
 # 导入角色B的类
-from module import Food, User
-from rule_engine import RuleEngine
+from backend.modle import Food, User
+from backend.rule_engine import RuleEngine
 
 # ========== 页面配置 ==========
 st.set_page_config(
