@@ -1,6 +1,75 @@
 
 # app.py - 完整版（适配角色A的数据 + 角色B的后端）
 import streamlit as st
+st.set_page_config(
+    page_title="健康服务",
+    layout="wide",
+    initial_sidebar_state="auto"
+)
+
+# ========== 最终质感版 · 年轻简约健康绿 ==========
+st.markdown("""
+<style>
+/* 整体背景：干净浅绿渐变，无杂乱图案，高级柔和 */
+.stApp {
+    background: linear-gradient(135deg, #F7FBFA 0%, #EFF8F5 100%);
+    background-attachment: fixed;
+}
+
+/* 标题：稳重健康绿 */
+h1, h2, h3, h4, h5, h6 {
+    color: #1A5E43 !important;
+    font-weight: 600 !important;
+}
+
+/* 正文 */
+p, li, span {
+    color: #3D5158 !important;
+    line-height: 1.6 !important;
+}
+
+/* 按钮：柔和青绿，大圆角，年轻不土 */
+div.stButton > button {
+    background-color: #2CCF9F;
+    color: white;
+    border-radius: 14px;
+    padding: 0.6em 1.5em;
+    font-size: 15px;
+    border: none;
+    box-shadow: 0 4px 10px rgba(44, 207, 159, 0.15);
+}
+div.stButton > button:hover {
+    background-color: #26B88E;
+    box-shadow: 0 6px 14px rgba(44, 207, 159, 0.2);
+}
+
+/* 输入框：简洁圆润 */
+.stTextInput > div > div,
+.stNumberInput > div > div,
+.stSelectbox > div > div,
+.stTextArea > div > div {
+    background-color: #FFFFFF !important;
+    border-radius: 12px !important;
+    border: 1px solid #D6E9E2 !important;
+}
+
+/* 侧边栏：干净柔和 */
+section[data-testid="stSidebar"] {
+    background-color: #F2F9F6;
+}
+
+/* 卡片：简约白，高级不花哨 */
+.element-container {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    padding: 1.1rem;
+    box-shadow: 0 4px 12px rgba(0, 80, 50, 0.05);
+    margin-bottom: 1rem;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# ==================== 下面放你原来的全部代码 ====================
 import pandas as pd
 import json
 import sys
