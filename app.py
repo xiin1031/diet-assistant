@@ -47,11 +47,11 @@ div.stButton > button:hover {
 .stTextInput > div > div,
 .stNumberInput > div > div,
 .stSelectbox > div > div,
-.stTextArea > div > div {
-    background-color: #FFFFFF !important;
+.stTextArea > div > div 
+    {
     border-radius: 12px !important;
     border: 1px solid #D6E9E2 !important;
-}
+    }
 
 /* 侧边栏：干净柔和 */
 section[data-testid="stSidebar"] {
@@ -110,6 +110,9 @@ with st.sidebar:
     has_kidney_disease = st.checkbox("肾病")
     has_diabetes = st.checkbox("糖尿病")
     has_heart_failure = st.checkbox("心力衰竭")
+    has_diabetes_and_hypertension=st.checkbox("糖尿病加高血压")
+    has_hypertension=st.checkbox("高血压")
+    has_healty=st.checkbox("普通")
     
     st.subheader("特殊人群")
     is_pregnant = st.checkbox("孕妇")
@@ -158,10 +161,14 @@ def create_user():
         diseases.append("糖尿病")
     if has_heart_failure:
         diseases.append("心力衰竭")
+    if has_hypertension:
+        diseases.append("高血压")
     if is_pregnant:
         diseases.append("孕妇")
     if is_lactating:
         diseases.append("哺乳期")
+    if has_healty:
+        diseases.append("普通")
     
     # 创建User对象（User类会自动根据年龄和血压添加对应疾病）
     user = User(
@@ -353,8 +360,8 @@ with tab3:
             st.metric("食物总数", len(food_df))
     else:
         st.info("📭 食物数据库为空")
-    
-    st.caption("📝 数据来源：角色A提供的食物数据库")
+
+    st.caption("📝 数据来源：Food-101 Nutritional Information") 
 
 # ========== 底部信息 ==========
 st.markdown("---")
