@@ -80,8 +80,19 @@ from datetime import datetime
 sys.path.append(os.path.join(os.path.dirname(__file__), 'backend'))
 
 # 导入角色B的类
-from backend.modle import Food, User
+from backend.module import Food, User
 from backend.rule_engine import RuleEngine
+# ========== 新增：图像识别导入 ==========
+from backend.api import recognize_food_from_image,initialize
+
+# ========== 新增：初始化后端 ==========
+try:
+    initialize()
+    image_recognition_ready = True
+    st.success("✅ 图像识别模块已就绪")
+except Exception as e:
+    image_recognition_ready = False
+    st.warning(f"⚠️ 图像识别模块初始化失败：{e}")
 
 # ========== 页面配置 ==========
 st.set_page_config(
@@ -235,7 +246,7 @@ else:
     food_names = []
 
 # ========== 主要内容区域 ==========
-tab1, tab2, tab3 = st.tabs(["📋 选择食物", "🔍 批量检测", "📊 食物数据库"])
+tab1, tab2, tab3, tab4= st.tabs(["📋 选择食物", "🔍 批量检测", "📊 食物数据库","📷 拍照识别"])
 
 # ========== Tab 1: 单个食物选择 ==========
 with tab1:
@@ -363,6 +374,159 @@ with tab3:
 
     st.caption("📝 数据来源：Food-101 Nutritional Information") 
 
+
+# ========== Tab 4: 拍照识别 ==========
+with tab4:
+    st.subheader("📷 拍照/上传图片识别食物")
+    st.info("💡 拍摄或上传食物图片，系统会自动识别食物名称并计算钠含量")
+    
+    # 检查图像识别是否可用
+    if not image_recognition_ready:
+        st.error("❌ 图像识别功能不可用，请检查后端配置")
+        st.stop()
+    
+    # 选择输入方式
+    input_method = st.radio("选择输入方式", ["📸 拍照", "📁 上传图片"], horizontal=True)
+    
+    uploaded_image = None
+    
+    if input_method == "📸 拍照":
+        uploaded_image = st.camera_input("拍照识别食物")
+    else:
+        uploaded_image = st.file_uploader("上传食物图片", type=["jpg", "jpeg", "png"])
+    
+    if uploaded_image is not None:
+        # 显示图片
+        st.image(uploaded_image, caption="上传的图片", width=300)
+        
+        if st.button("🔍 识别食物", type="primary"):
+            with st.spinner("识别中，请稍候..."):
+                try:
+                    # 保存临时图片
+                    import tempfile
+                    with tempfile.NamedTemporaryFile(delete=False, suffix='.jpg') as tmp_file:
+                        tmp_file.write(uploaded_image.getvalue())
+                        tmp_path = tmp_file.name
+                    
+                    # 调用角色B的识别函数
+                    english_name, confidence, chinese_name, sodium = recognize_food_from_image(tmp_path)
+                    
+                    # 删除临时文件
+                    os.unlink(tmp_path)
+                    
+                    # ========== 显示识别结果 ==========
+                    st.success(f"✅ 识别成功！")
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.metric("识别食物", chinese_name)
+                        st.metric("英文名称", english_name)
+                    with col2:
+                        st.metric("置信度", f"{confidence:.1%}")
+                        st.metric("钠含量 (每100g)", f"{sodium} mg")
+                    
+                    # ========== 系统建议 ==========
+                    st.markdown("---")
+                    st.subheader("📋 系统建议")
+                    
+                    # 根据钠含量给出初步建议
+                    if sodium <= 120:
+                        sodium_level = "低钠"
+                        sodium_color = "🟢"
+                        sodium_advice = "该食物钠含量较低，可放心食用。"
+                    elif sodium <= 400:
+                        sodium_level = "中钠"
+                        sodium_color = "🟡"
+                        sodium_advice = "该食物钠含量中等，建议适量食用，注意控制份量。"
+                    else:
+                        sodium_level = "高钠"
+                        sodium_color = "🔴"
+                        sodium_advice = "该食物钠含量较高，高血压、肾病患者应尽量避免。"
+                    
+                    # 获取患者每日限制
+                    user = create_user()
+                    user_daily_limit = user.daily_limit
+                    
+                    # 计算一份100g占每日限制的比例
+                    sodium_per_100g = sodium
+                    ratio = (sodium_per_100g / user_daily_limit) * 100
+                    
+                    # 根据比例给出更具体的建议
+                    if ratio > 50:
+                        portion_advice = f"⚠️ **警告**：仅100g该食物就占您每日钠摄入限制的 {ratio:.0f}%，建议避免食用或只吃极少份量（<30g）。"
+                    elif ratio > 25:
+                        portion_advice = f"⚡ **注意**：100g该食物占您每日钠摄入限制的 {ratio:.0f}%，建议控制在50g以内。"
+                    else:
+                        portion_advice = f"✅ **尚可**：100g该食物仅占您每日钠摄入限制的 {ratio:.0f}%，可适量食用。"
+                    
+                    # 根据患者健康状况给出个性化建议
+                    health_advice = []
+                    
+                    if "高血压" in user.diseases or any("高血压" in d for d in user.diseases):
+                        health_advice.append("🔴 您有高血压，每日钠摄入应控制在2000mg以下，高钠食物会使血压升高。")
+                    if "肾病" in user.diseases:
+                        health_advice.append("🟠 您有肾脏疾病，肾脏排钠能力下降，需严格控制钠摄入。")
+                    if "糖尿病" in user.diseases:
+                        health_advice.append("🟡 您有糖尿病，低钠饮食有助于控制血压，降低心血管风险。")
+                    if "心力衰竭" in user.diseases:
+                        health_advice.append("🟠 您有心力衰竭，钠摄入过多会加重水肿和心脏负担。")
+                    
+                    # 从侧边栏获取特殊人群信息
+                    if is_pregnant:
+                        health_advice.append("🤰 您处于孕期，控制钠摄入有助于预防妊娠高血压。")
+                    if is_lactating:
+                        health_advice.append("🤱 您处于哺乳期，低钠饮食对母婴健康都有益。")
+                    
+                    if not health_advice:
+                        health_advice.append("✅ 您暂无特殊健康状况，但仍建议每日钠摄入不超过2000mg。")
+                    
+                    # 显示所有建议
+                    st.markdown(f"""
+                    ### {sodium_color} 食物钠含量评估：**{sodium_level}**（{sodium} mg/100g）
+                    - {sodium_advice}
+                    - {portion_advice}
+                    
+                    ### 💊 针对您的健康状况：
+                    {''.join([f'- {advice}' for advice in health_advice])}
+                    
+                    ### 📝 食用建议：
+                    | 您的状况 | 建议食用量 |
+                    |---------|-----------|
+                    | 健康人群 | 每日不超过200g |
+                    | 有高血压/肾病 | 不建议食用或少于30g |
+                    | 其他慢性病 | 每日不超过100g |
+                    """)
+                    
+                    st.caption(f"📌 您的每日钠摄入上限为 **{user_daily_limit} mg**，请注意控制全天总量。")
+                    
+                    # ========== 加入风险检测 ==========
+                    st.markdown("---")
+                    st.subheader("➕ 将此食物加入风险检测")
+                    
+                    col1, col2 = st.columns([2, 1])
+                    with col1:
+                        confirm_quantity = st.number_input("份量 (克)", min_value=10, max_value=500, value=100, step=10, key="recog_quantity")
+                    with col2:
+                        st.write("")
+                        st.write("")
+                        if st.button("检测此食物", type="primary"):
+                            user = create_user()
+                            food_items = [(chinese_name, confirm_quantity)]
+                            result, total_sodium = check_risk_with_backend(food_items, user)
+                            
+                            st.info(user.summary())
+                            
+                            # 计算占每日限制的比例
+                            ratio_this = (total_sodium / user.daily_limit) * 100
+                            
+                            if result == "红灯":
+                                st.error(f"⚠️ 红灯！摄入 {total_sodium:.0f}mg 钠，占您每日限制的 {ratio_this:.0f}%，已超标！")
+                                st.warning("建议：今日剩余时间请选择低钠食物，多喝水帮助排钠。")
+                            else:
+                                st.success(f"✅ 绿灯！摄入 {total_sodium:.0f}mg 钠，占您每日限制的 {ratio_this:.0f}%，在安全范围内。")
+                
+                except Exception as e:
+                    st.error(f"识别失败：{str(e)}")
+                    st.info("提示：请确保后端模型文件 best.pt 存在且路径正确")
 # ========== 底部信息 ==========
 st.markdown("---")
 st.caption("⚠️ 本工具仅供参考，不能替代专业医疗建议")

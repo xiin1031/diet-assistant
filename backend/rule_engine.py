@@ -1,4 +1,4 @@
-from modle import User
+from module import User
 
 class RuleEngine:
     def check_risk(self, food_list, user):
