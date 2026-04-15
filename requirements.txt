@@ -1,5 +1,6 @@
+opencv-python-headless
 streamlit
 pandas
 numpy
 ultralytics
-opencv-python-headless
+
