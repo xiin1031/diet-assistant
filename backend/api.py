@@ -29,8 +29,10 @@ def initialize(csv_path="data/food_data.csv"):
 # ================================
 # ✅ 完全保留你写的正确识别函数
 # ================================
+current_dir=os.path.dirname(__file__)
+model_path=os.path.join(current_dir,"backend","best.pt")
 def recognize_food_from_image(image_path):
-    model = YOLO(r"D:\git\diet-assistant\backend\best.pt")
+    model = YOLO(model_path)
     results = model.predict(image_path, imgsz=224, verbose=False, device="cpu", task='classify')
     res = results[0]
 
@@ -77,4 +79,4 @@ def evaluate_food_risk(*args):
     return []
 
 def _load_recognition_model():
-    return YOLO(r"D:\git\diet-assistant\backend\best.pt")
+    return YOLO(model_path)
