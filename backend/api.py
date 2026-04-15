@@ -1,8 +1,4 @@
 import os
-import ssl
-ssl._create_default_https_context = ssl._create_unverified_context
-os.environ["ULTRALYTICS_OFFLINE"] = "1"
-os.environ["ULTRALYTICS_VERBOSE"] = "0" 
 import csv
 from ultralytics import YOLO
 
