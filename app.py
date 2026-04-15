@@ -78,6 +78,8 @@ os.environ["LIBGL_ALWAYS_INDIRECT"] = "0"
 os.environ["DISPLAY"] = ":0"
 # 额外：强制ultralytics用CPU模式，避免GPU依赖
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+import cv2
+sys.modules['cv2']=cv2
 
 import pandas as pd
 import json
