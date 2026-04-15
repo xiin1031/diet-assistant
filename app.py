@@ -70,10 +70,18 @@ section[data-testid="stSidebar"] {
 """, unsafe_allow_html=True)
 
 # ==================== 下面放你原来的全部代码 ====================
+import os
+# 强制禁用所有图形界面、硬件加速，彻底绕开libGL/libgthread依赖
+os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
+os.environ["QT_QPA_PLATFORM"] = "offscreen"
+os.environ["LIBGL_ALWAYS_INDIRECT"] = "0"
+os.environ["DISPLAY"] = ":0"
+# 额外：强制ultralytics用CPU模式，避免GPU依赖
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
 import pandas as pd
 import json
 import sys
-import os
 from datetime import datetime
 
 # 添加backend路径，导入角色B的模块
