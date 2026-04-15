@@ -1,4 +1,8 @@
 import os
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
+os.environ["ULTRALYTICS_OFFLINE"] = "1"
+os.environ["ULTRALYTICS_VERBOSE"] = "0" 
 import csv
 from ultralytics import YOLO
 
@@ -30,7 +34,7 @@ def initialize(csv_path="data/food_data.csv"):
 # ✅ 完全保留你写的正确识别函数
 # ================================
 current_dir=os.path.dirname(__file__)
-model_path=os.path.join(current_dir,"backend","best.pt")
+model_path=os.path.join(current_dir,"best.pt")
 def recognize_food_from_image(image_path):
     model = YOLO(model_path)
     results = model.predict(image_path, imgsz=224, verbose=False, device="cpu", task='classify')
