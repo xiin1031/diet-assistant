@@ -1,5 +1,5 @@
 streamlit
 pandas
 numpy
-ultralytics
+ultralytics --no-deps
 opencv-python-headless
