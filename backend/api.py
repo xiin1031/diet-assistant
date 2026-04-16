@@ -31,8 +31,9 @@ def initialize(csv_path="data/food_data.csv"):
 # ================================
 current_dir=os.path.dirname(__file__)
 model_path=os.path.join(current_dir,"best.pt")
+model = YOLO(model_path)
 def recognize_food_from_image(image_path):
-    model = YOLO(model_path)
+ 
     results = model.predict(image_path, imgsz=224, verbose=False, device="cpu", task='classify')
     res = results[0]
 
