@@ -180,7 +180,7 @@ def create_user():
         diseases.append("孕妇")
     if is_lactating:
         diseases.append("哺乳期")
-    if has_healty:
+    if has_healthy:
         diseases.append("普通")
     
     # 创建User对象（User类会自动根据年龄和血压添加对应疾病）
