@@ -71,6 +71,8 @@ section[data-testid="stSidebar"] {
 
 # ==================== 下面放你原来的全部代码 ====================
 import os
+os.environ["CUDA_VISIBLE_DEVICES"]="-1"
+import cv2
 import pandas as pd
 import json
 import sys
