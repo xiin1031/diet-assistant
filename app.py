@@ -78,7 +78,6 @@ os.environ["LIBGL_ALWAYS_INDIRECT"] = "0"
 os.environ["DISPLAY"] = ":0"
 # 额外：强制ultralytics用CPU模式，避免GPU依赖
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-import cv2
 sys.modules['cv2']=cv2
 
 import pandas as pd
@@ -133,7 +132,7 @@ with st.sidebar:
     has_heart_failure = st.checkbox("心力衰竭")
     has_diabetes_and_hypertension=st.checkbox("糖尿病加高血压")
     has_hypertension=st.checkbox("高血压")
-    has_healty=st.checkbox("普通")
+    has_healthy=st.checkbox("普通")
     
     st.subheader("特殊人群")
     is_pregnant = st.checkbox("孕妇")
@@ -539,5 +538,4 @@ with tab4:
                     st.info("提示：请确保后端模型文件 best.pt 存在且路径正确")
 # ========== 底部信息 ==========
 st.markdown("---")
-st.caption("⚠️ 本工具仅供参考，不能替代专业医疗建议")
 st.caption("⚠️ 本工具仅供参考，不能替代专业医疗建议")
